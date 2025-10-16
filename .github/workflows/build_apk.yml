@@ -1,0 +1,64 @@
+name: 🚀 Build & Release APK (Flutter) 🚀
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build_apk:
+    name: 🏗️ Build Android APK
+    runs-on: ubuntu-latest
+
+    # ✅ CORREÇÃO: Dando permissão para o job criar a Release.
+    permissions:
+      contents: write
+
+    steps:
+      - name: ⬇️ Checkout do Repositório
+        uses: actions/checkout@v4
+
+      - name: 💙 Configurar Flutter SDK
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.22.2'
+          cache: true
+
+      - name: 🧩 Instalar Dependências (flutter pub get)
+        run: flutter pub get
+
+      # Desativamos o passo de teste, conforme sua necessidade.
+      # - name: 🧪 Executar Testes (Opcional, mas recomendado!)
+      #   run: flutter test
+
+      - name: ⚙️ Buildar o APK de Release
+        run: flutter build apk --release
+
+      - name: 📦 Renomear APK (Opcional)
+        run: |
+          BUILD_NUMBER=${{ github.run_number }}
+          mv build/app/outputs/flutter-apk/app-release.apk build/app/outputs/flutter-apk/app-release-$BUILD_NUMBER.apk
+
+      - name: ⬆️ Upload do APK como Artefato
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release-apk
+          path: build/app/outputs/flutter-apk/app-release-*.apk
+          retention-days: 5
+
+      - name: 📝 Criar Release no GitHub (Opcional, mas útil!)
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ github.run_number }}
+          name: Release v${{ github.run_number }}
+          body: |
+            ✨ Nova versão do aplicativo gerada automaticamente pelo CI/CD.
+            [Link para a build](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+          draft: true
+          prerelease: false
+          files: build/app/outputs/flutter-apk/app-release-*.apk
