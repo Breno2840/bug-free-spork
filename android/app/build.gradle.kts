@@ -12,7 +12,7 @@ val flutterVersionName: String? by project
 
 android {
     // Define o namespace do seu aplicativo, importante para o Android.
-    namespace = "com.example.curly_journey"
+    namespace = "com.calculadora.my"
     compileSdk = 34 // Versão do SDK do Android para compilar.
 
     // Configuração para o código fonte.
@@ -24,7 +24,7 @@ android {
 
     defaultConfig {
         // Configurações padrão do aplicativo.
-        applicationId = "com.example.curly_journey"
+        applicationId = "com.calculadora.my"
         minSdk = 21      // Mínima versão do Android que seu app suporta.
         targetSdk = 34     // Versão do Android para a qual o app foi otimizado.
 
